@@ -1,4 +1,4 @@
-require_relative 'lib/pulse_ffi'
+require_relative '../lib/pulse_ffi'
 
 include PulseFFI::Bindings
 
