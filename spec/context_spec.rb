@@ -44,6 +44,48 @@ describe Context do
     context.state
   end
 
+  specify "set_state_callbacks delegates to pa_context_set_state_callback" do
+    context, bindings = test_context
+    my_func = Proc.new {}
+    bindings.should_receive(:pa_context_set_state_callback).
+      with(:pa_context, my_func, :data)
+    context.set_state_callback(my_func, :data)
+  end
+
+  specify "on_state_change with no data" do
+    context, bindings = test_context
+
+    bindings.should_receive(:pa_context_set_state_callback) do |context, callback|
+      expect(context).to eq(:pa_context)
+      callback.call(context) # this should call the block passed to on_state_change
+    end
+
+    probe = double
+    probe.should_receive(:ping)
+
+    context.on_state_change { |context|
+      probe.ping
+      expect(context.pa_context).to eq(:pa_context)
+    }
+  end
+
+  specify "on_state_change with some user data" do
+    context, bindings = test_context
+
+    bindings.should_receive(:pa_context_set_state_callback) do |context, callback|
+      expect(context).to eq(:pa_context)
+      callback.call(context, 42)
+    end
+
+    probe = double
+    probe.should_receive(:ping).with(42)
+
+    context.on_state_change { |context, answer|
+      probe.ping(answer)
+      expect(context.pa_context).to eq(:pa_context)
+    }
+  end
+
 
   def test_context
     bindings = double

@@ -1,6 +1,6 @@
 module PulseFFI
   class Context
-    attr_reader :pa_context, :name
+    attr_reader :bindings, :pa_context, :name
 
     def initialize(pulse_loop, name)
       @name = name
@@ -23,5 +23,18 @@ module PulseFFI
     def state
       @bindings.pa_context_get_state(@pa_context)
     end
+
+    def on_state_change(&callback)
+      low_level_callback = Proc.new { |pa_context, data|
+        callback.call(self, data)
+      }
+      @bindings.pa_context_set_state_callback(@pa_context,
+                                              low_level_callback, nil)
+    end
+
+    def set_state_callback(callback, data=nil)
+      @bindings.pa_context_set_state_callback(@pa_context, callback, data)
+    end
   end
+
 end

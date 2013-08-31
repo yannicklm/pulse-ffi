@@ -5,10 +5,8 @@ include PulseFFI::Bindings
 PulseFFI.mainloop do |mainloop|
   context = mainloop.context("RubyTapas")
   pa_context = context.pa_context
-
-  start_query_when_ready = ->(pa_context, userdata) do
+  context.on_state_change do |context|
     if context.state == :ready
-
       print_audio_source = ->(pa_context, source_info_ptr, eol, userdata) do
         # End of list
         if eol == 1
@@ -24,9 +22,5 @@ PulseFFI.mainloop do |mainloop|
       pa_context_get_source_info_list(pa_context, print_audio_source, nil)
     end
   end
-
-  pa_context_set_state_callback(pa_context,
-                                start_query_when_ready, nil)
-
   context.connect
 end
