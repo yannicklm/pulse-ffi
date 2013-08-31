@@ -16,13 +16,15 @@ module PulseFFI
     end
 
     def test_class_run_creates_yields_runs_and_frees_mainloop
-      probe = double
-      Mainloop.stub(new: loop = double)
-      probe.should_receive(:ping).ordered
-      loop.should_receive(:run).ordered
-      loop.should_receive(:free).ordered
-      Mainloop.run do
-        probe.ping
+      loop = double
+      Mainloop.stub("new", loop) do
+        probe = double
+        probe.should_receive(:ping).ordered
+        loop.should_receive(:run).ordered
+        loop.should_receive(:free).ordered
+        Mainloop.run do
+          probe.ping
+        end
       end
     end
 
