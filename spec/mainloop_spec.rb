@@ -47,4 +47,13 @@ describe Mainloop do
     loop.free
   end
 
+  specify "get api" do
+    api = double(:pa_mainloop_new => :mainloop_ptr)
+    api.should_receive(:pa_mainloop_get_api).
+      with(:mainloop_ptr).
+      and_return(:pulse_api)
+    loop = Mainloop.new(api: api)
+    expect(loop.api).to eq(:pulse_api)
+  end
+
 end

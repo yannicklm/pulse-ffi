@@ -25,6 +25,10 @@ module PulseFFI
     def free
       @api.pa_mainloop_free(@pointer)
     end
+
+    def api
+      @api.pa_mainloop_get_api(@pointer)
+    end
   end
 
 end
