@@ -3,6 +3,13 @@ module PulseFFI
   class Mainloop
     attr_reader :pointer
 
+    def self.run(options = {})
+      loop = new(options)
+      yield
+      loop.run
+      loop.free
+    end
+
     def initialize(options = {})
       @api = options.fetch(:api) {
         Object.new.extend(Bindings)
