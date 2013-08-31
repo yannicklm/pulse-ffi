@@ -28,32 +28,58 @@ describe Mainloop do
   end
 
   specify "#initialize creates mainloop" do
-    api = double(:pa_mainloop_new => :mainloop_ptr)
-    loop = Mainloop.new(api: api)
+    bindings = double(:pa_mainloop_new => :mainloop_ptr)
+    loop = Mainloop.new(bindings: bindings)
     expect(loop.pointer).to eq(:mainloop_ptr)
   end
 
   specify "#run starts mainloop" do
-    api = double(pa_mainloop_new: mainloop_ptr = double)
-    api.should_receive(:pa_mainloop_run).with(mainloop_ptr, nil)
-    loop = Mainloop.new(api: api)
+    bindings = double(pa_mainloop_new: mainloop_ptr = double)
+    bindings.should_receive(:pa_mainloop_run).with(mainloop_ptr, nil)
+    loop = Mainloop.new(bindings: bindings)
     loop.run
   end
 
   specify "#free frees mainloop" do
-    api = double(pa_mainloop_new: mainloop_ptr = double)
-    api.should_receive(:pa_mainloop_free).with(mainloop_ptr)
-    loop = Mainloop.new(api: api)
+    bindings = double(pa_mainloop_new: mainloop_ptr = double)
+    bindings.should_receive(:pa_mainloop_free).with(mainloop_ptr)
+    loop = Mainloop.new(bindings: bindings)
     loop.free
   end
 
+  specify "#quit quits mainloop" do
+    bindings = double(pa_mainloop_new: mainloop_ptr = double)
+    bindings.should_receive(:pa_mainloop_quit).with(mainloop_ptr, 0)
+    loop = Mainloop.new(bindings: bindings)
+    loop.quit(0)
+  end
+
   specify "get api" do
-    api = double(:pa_mainloop_new => :mainloop_ptr)
-    api.should_receive(:pa_mainloop_get_api).
+    bindings = double(:pa_mainloop_new => :mainloop_ptr)
+    bindings.should_receive(:pa_mainloop_get_api).
       with(:mainloop_ptr).
       and_return(:pulse_api)
-    loop = Mainloop.new(api: api)
-    expect(loop.api).to eq(:pulse_api)
+    loop = Mainloop.new(bindings: bindings)
+    expect(loop.pa_api).to eq(:pulse_api)
   end
+
+  specify "get context" do
+    bindings = double(:pa_mainloop_new => :mainloop_ptr)
+    bindings.should_receive(:pa_mainloop_get_api).
+      with(:mainloop_ptr).
+      and_return(:pulse_api)
+    bindings.should_receive(:pa_context_new).
+      with(:pulse_api, "the context").
+      and_return(:context)
+
+    loop = Mainloop.new(bindings: bindings)
+    context = loop.context("the context")
+    expect(context.pa_context).to eq(:context)
+    expect(context.name).to eq("the context")
+
+  end
+
+
+
 
 end

@@ -3,18 +3,17 @@ require_relative '../lib/pulse_ffi'
 include PulseFFI::Bindings
 
 PulseFFI.mainloop do |mainloop|
-  api      = mainloop.api
-  context  = pa_context_new(api, "RubyTapas")
+  context = mainloop.context("RubyTapas")
+  pa_context = context.pa_context
 
-  start_query_when_ready = ->(context, userdata) do
-    state = pa_context_get_state(context)
-    if state == :ready
+  start_query_when_ready = ->(pa_context, userdata) do
+    if context.state == :ready
 
-      print_audio_source = ->(context, source_info_ptr, eol, userdata) do
+      print_audio_source = ->(pa_context, source_info_ptr, eol, userdata) do
         # End of list
         if eol == 1
-          pa_context_disconnect(context)
-          pa_mainloop_quit(mainloop.pointer, 0)
+          context.disconnect
+          mainloop.quit(0)
           return
         end
 
@@ -22,12 +21,12 @@ PulseFFI.mainloop do |mainloop|
         puts "#{source_info[:index]} #{source_info[:description]}"
       end
 
-      pa_context_get_source_info_list(context, print_audio_source, nil)
+      pa_context_get_source_info_list(pa_context, print_audio_source, nil)
     end
   end
 
-  pa_context_set_state_callback(context,
+  pa_context_set_state_callback(pa_context,
                                 start_query_when_ready, nil)
 
-  pa_context_connect(context, nil, :noflags, nil)
+  context.connect
 end
