@@ -1,9 +1,12 @@
+require 'pulse_ffi/source_info_list'
+
 module PulseFFI
   class Context
-    attr_reader :bindings, :pa_context, :name
+    attr_reader :bindings, :pa_context, :name, :pulse_loop
 
     def initialize(pulse_loop, name)
       @name = name
+      @pulse_loop = pulse_loop
       @bindings = pulse_loop.bindings
       @pa_context = @bindings.pa_context_new(pulse_loop.pa_api, name)
       @state = nil

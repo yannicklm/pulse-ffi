@@ -13,4 +13,14 @@ describe SourceInfoList do
     source_list = SourceInfoList.new(context)
   end
 
+  it "can loop through source info" do
+    pulse_test = PulseTest.new
+    sources = []
+    pulse_test.source_info.each { |source|
+      sources << source
+    }
+    expect(sources).to have(3).items
+  end
+
+
 end

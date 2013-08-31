@@ -27,5 +27,9 @@ class PulseTest
     main_loop.context("Test")
   end
 
+  def source_info
+    context.source_info
+  end
+
 end
 

@@ -6,20 +6,18 @@ PulseFFI.mainloop do |mainloop|
   context = mainloop.context("RubyTapas")
   pa_context = context.pa_context
   context.on_state_change do |context|
-    if context.state == :ready
-      print_audio_source = ->(pa_context, source_info_ptr, eol, userdata) do
-        # End of list
-        if eol == 1
-          context.disconnect
-          mainloop.quit(0)
-          return
+    begin
+      if context.state == :ready
+        source_info = context.source_info
+        source_info.each do |source_info|
+          puts "#{source_info[:index]} #{source_info[:description]}"
         end
-
-        source_info = SourceInfo.new(source_info_ptr)
-        puts "#{source_info[:index]} #{source_info[:description]}"
       end
-
-      pa_context_get_source_info_list(pa_context, print_audio_source, nil)
+    rescue Exception => e
+      p e
+      print e.backtrace.join("\n")
+      context.disconnect
+      mainloop.quit
     end
   end
   context.connect
