@@ -9,6 +9,14 @@ module PulseFFI
       }
       @pointer = @api.pa_mainloop_new
     end
+
+    def run
+      @api.pa_mainloop_run(@pointer, nil)
+    end
+
+    def free
+      @api.pa_mainloop_free(@pointer)
+    end
   end
 
 end
