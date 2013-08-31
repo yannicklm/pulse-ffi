@@ -1,4 +1,5 @@
 require_relative 'pulse_ffi/bindings'
+require_relative 'pulse_ffi/mainloop'
 
 module PulseFFI
 

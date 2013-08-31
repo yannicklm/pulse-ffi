@@ -19,11 +19,24 @@ module PulseFFI
       loop = double
       Mainloop.stub("new", loop) do
         probe = double
-        probe.should_receive(:ping).ordered
+        probe.should_receive(:ping).with(loop).ordered
         loop.should_receive(:run).ordered
         loop.should_receive(:free).ordered
-        Mainloop.run do
-          probe.ping
+        Mainloop.run do |mainloop|
+          probe.ping(mainloop)
+        end
+      end
+    end
+
+    def test_class_run_ensures_mainloop_freed
+      loop = double.as_null_object
+      Mainloop.stub(:new, loop) do
+        loop.should_receive(:free)
+        begin
+          Mainloop.run do
+            raise Exception, "Oh no!"
+          end
+        rescue Exception
         end
       end
     end

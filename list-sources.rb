@@ -3,8 +3,6 @@ require_relative 'lib/pulse_ffi'
 include PulseFFI::Bindings
 
 PulseFFI.mainloop do |mainloop|
-
-  # mainloop = pa_mainloop_new
   api      = pa_mainloop_get_api(mainloop.pointer)
   context  = pa_context_new(api, "RubyTapas")
 
@@ -32,7 +30,4 @@ PulseFFI.mainloop do |mainloop|
                                 start_query_when_ready, nil)
 
   pa_context_connect(context, nil, :noflags, nil)
-  #pa_mainloop_run(mainloop, nil)
-
-  #pa_mainloop_free(mainloop)
 end
