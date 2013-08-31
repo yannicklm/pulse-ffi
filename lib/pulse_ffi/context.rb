@@ -35,6 +35,10 @@ module PulseFFI
     def set_state_callback(callback, data=nil)
       @bindings.pa_context_set_state_callback(@pa_context, callback, data)
     end
+
+    def source_info
+      SourceInfoList.new(self)
+    end
   end
 
 end
